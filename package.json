@@ -6,7 +6,7 @@
   "lint-staged": {
     "**/*.{js,jsx}": [
       "npx prettier --write",
-      "npm eslint --fix"
+      "npx eslint --fix"
     ]
   },
   "scripts": {
@@ -23,6 +23,8 @@
     "react-dom": "^18.3.1"
   },
   "devDependencies": {
+    "@commitlint/cli": "^20.5.0",
+    "@commitlint/config-conventional": "^20.5.0",
     "@eslint/js": "^9.17.0",
     "@types/react": "^18.3.18",
     "@types/react-dom": "^18.3.5",
