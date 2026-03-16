@@ -15,7 +15,8 @@
     "lint": "eslint src",
     "preview": "vite preview",
     "lint_1": "eslint src",
-    "prepare": "husky install"
+    "test": "echo 'test'",
+    "prepare": "husky"
   },
   "dependencies": {
     "react": "^18.3.1",
