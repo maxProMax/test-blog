@@ -1,4 +1,4 @@
-name: Blog frontend ci
+name: Blog frontend CI
 
 on:
   push:
