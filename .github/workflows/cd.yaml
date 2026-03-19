@@ -30,7 +30,7 @@ jobs:
           tags: ${{secrets.DOCKERHUB_USERNAME}}/blog-backend:latest
       - id: deploy-backend
         name: Deploy backend
-        uses: google-github-actions/deploy-cloudrun@v1
+        uses: google-github-actions/deploy-cloudrun@v3
         with:
           service: blog-backend
           image: ${{secrets.DOCKERHUB_USERNAME}}/blog-backend:latest
@@ -46,7 +46,7 @@ jobs:
           run: echo ${{steps.deploy-backend.outputs.url}}
       - id: deploy-frontend
         name: Deploy frontend
-        uses: google-github-actions/deploy-cloudrun@v1
+        uses: google-github-actions/deploy-cloudrun@v3
         with:
           service: blog-frontend
           image: ${{secrets.DOCKERHUB_USERNAME}}/blog-frontend:latest
