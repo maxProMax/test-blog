@@ -1,5 +1,5 @@
 import { FC } from 'react'
-import { Post, PostQuery } from '../api/post'
+import { PostQuery } from '../api/post'
 
 type Field = PostQuery['sortBy']
 type SortOrderType = PostQuery['sortOrder']

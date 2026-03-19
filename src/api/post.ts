@@ -19,7 +19,7 @@ export const getPosts = async (query: PostQuery = {}): Promise<Post[]> => {
   const url = new URL(`${import.meta.env.VITE_BACKEND_URL}/api/v1/posts`)
 
   Object.entries(query).forEach(([key, value]) => {
-    value && url.searchParams.append(key, value)
+    if (value) url.searchParams.append(key, value)
   })
 
   const res = await fetch(url)
