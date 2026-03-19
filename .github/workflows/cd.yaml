@@ -34,7 +34,7 @@ jobs:
         with:
           service: blog-backend
           image: ${{secrets.DOCKERHUB_USERNAME}}/blog-backend:latest
-          region: ${{secrets.DOCKERHUB_REGION}}
+          # region: ${{secrets.DOCKERHUB_REGION}}
       - name: Build and push frontend image
         uses: docker/build-push-action@v4
         with:
@@ -50,4 +50,4 @@ jobs:
         with:
           service: blog-frontend
           image: ${{secrets.DOCKERHUB_USERNAME}}/blog-frontend:latest
-          region: ${{secrets.DOCKERHUB_REGION}}
+          # region: ${{secrets.DOCKERHUB_REGION}}
