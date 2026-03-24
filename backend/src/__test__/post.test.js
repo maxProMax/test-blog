@@ -10,22 +10,27 @@ import {
   updatePost,
 } from '../services/post'
 import { Post } from '../db/models/post'
+import { User } from '../db/models/user'
 
-const author = new mongoose.Types.ObjectId()
 const samplePosts = [
-  { title: 'a', author, tags: ['1'] },
-  { title: 'a2', author, tags: ['2'] },
-  { title: 'a3', author },
+  { title: 'a', tags: ['1'] },
+  { title: 'a2', tags: ['2'] },
+  { title: 'a3' },
 ]
 
-let createsSamplePosts = []
+let createsSamplePosts = [],
+  author
 
 beforeEach(async () => {
+  await User.deleteMany()
   await Post.deleteMany({})
   createsSamplePosts = []
 
+  const user = new User({ username: 'test', password: 'test' })
+  author = await user.save()
+
   for (const post of samplePosts) {
-    const createPost = new Post(post)
+    const createPost = new Post({ ...post, author: author._id })
     createsSamplePosts.push(await createPost.save())
   }
 })
@@ -33,12 +38,11 @@ describe('create post', () => {
   test('with all parameters should succeed', async () => {
     const post = {
       title: 'asd',
-      author,
       contents: 'asdas',
       tags: ['ads'],
     }
 
-    const createdPost = await createPost(post)
+    const createdPost = await createPost(author, post)
 
     expect(createdPost._id).toBeInstanceOf(mongoose.Types.ObjectId)
 
@@ -50,13 +54,12 @@ describe('create post', () => {
 
   test('fail', async () => {
     const post = {
-      author: 'asd',
       contents: 'asds',
       tags: ['ads'],
     }
 
     try {
-      await createPost(post)
+      await createPost(author, post)
     } catch (error) {
       expect(error).toBeInstanceOf(mongoose.Error.ValidationError)
       expect(error.message).toContain('`title` is req')
@@ -65,10 +68,9 @@ describe('create post', () => {
   test('with minimal parameters should succeed', async () => {
     const post = {
       title: 'asd',
-      author,
     }
 
-    const createdPost = await createPost(post)
+    const createdPost = await createPost(author, post)
 
     expect(createdPost._id).toBeInstanceOf(mongoose.Types.ObjectId)
   })
@@ -106,7 +108,7 @@ describe('listing post', () => {
   })
 
   test('filter by author', async () => {
-    const posts = await listPostsByAuthor(author)
+    const posts = await listPostsByAuthor(author.username)
 
     expect(posts.length).toBe(3)
   })
@@ -133,16 +135,14 @@ describe('getting a post', () => {
 
 describe('update posts', () => {
   test('fail', async () => {
-    const post = await updatePost('000000000000000000000000', {
-      author,
-    })
+    const post = await updatePost(author, '000000000000000000000000', {})
     expect(post).toBeNull()
   })
 })
 
 describe('delete', () => {
   test('remove', async () => {
-    const result = await deletePost(createsSamplePosts[0]._id)
+    const result = await deletePost(author, createsSamplePosts[0]._id)
 
     expect(result.deletedCount).toBe(1)
 
