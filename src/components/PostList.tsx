@@ -10,6 +10,7 @@ export const PostList: FC<{
       {posts.map((post) => (
         <Fragment key={post._id}>
           <Post
+            _id={post._id}
             title={post.title}
             contents={post.contents}
             author={post.author}

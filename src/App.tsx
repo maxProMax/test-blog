@@ -1,13 +1,16 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { FC } from 'react'
-import Blog from './Blog'
+import { FC, PropsWithChildren } from 'react'
+import { AuthContextProvider } from './contexts/AuthContext'
+import { HelmetProvider } from 'react-helmet-async'
 
 const queryClient = new QueryClient()
 
-export const App: FC = () => {
+export const App: FC<PropsWithChildren> = ({ children }) => {
   return (
-    <QueryClientProvider client={queryClient}>
-      <Blog />
-    </QueryClientProvider>
+    <HelmetProvider>
+      <QueryClientProvider client={queryClient}>
+        <AuthContextProvider>{children}</AuthContextProvider>
+      </QueryClientProvider>
+    </HelmetProvider>
   )
 }

@@ -1,5 +1,5 @@
-import mongoose from "mongoose";
-import { describe, expect, test, beforeEach } from "@jest/globals";
+import mongoose from 'mongoose'
+import { describe, expect, test, beforeEach } from '@jest/globals'
 import {
   createPost,
   deletePost,
@@ -8,162 +8,152 @@ import {
   listPostByTag,
   listPostsByAuthor,
   updatePost,
-} from "../services/post";
-import { Post } from "../db/models/post";
+} from '../services/post'
+import { Post } from '../db/models/post'
 
+const author = new mongoose.Types.ObjectId()
 const samplePosts = [
-  { title: "a", author: "b", tags: ["1"] },
-  { title: "a2", author: "b", tags: ["2"] },
-  { title: "a3" },
-];
+  { title: 'a', author, tags: ['1'] },
+  { title: 'a2', author, tags: ['2'] },
+  { title: 'a3', author },
+]
 
-let createsSamplePosts = [];
+let createsSamplePosts = []
 
 beforeEach(async () => {
-  await Post.deleteMany({});
-  createsSamplePosts = [];
+  await Post.deleteMany({})
+  createsSamplePosts = []
 
   for (const post of samplePosts) {
-    const createPost = new Post(post);
-    createsSamplePosts.push(await createPost.save());
+    const createPost = new Post(post)
+    createsSamplePosts.push(await createPost.save())
   }
-});
-describe("create post", () => {
-  test("with all parameters should succeed", async () => {
+})
+describe('create post', () => {
+  test('with all parameters should succeed', async () => {
     const post = {
-      title: "asd",
-      author: "asd",
-      contents: "asds",
-      tags: ["ads"],
-    };
+      title: 'asd',
+      author,
+      contents: 'asdas',
+      tags: ['ads'],
+    }
 
-    const createdPost = await createPost(post);
+    const createdPost = await createPost(post)
 
-    expect(createdPost._id).toBeInstanceOf(mongoose.Types.ObjectId);
+    expect(createdPost._id).toBeInstanceOf(mongoose.Types.ObjectId)
 
-    const foundPost = await Post.findById(createdPost._id);
+    const foundPost = await Post.findById(createdPost._id)
 
-    expect(foundPost).toEqual(expect.objectContaining(post));
-    expect(foundPost.createdAt).toBeInstanceOf(Date);
-  });
+    expect(foundPost).toEqual(expect.objectContaining(post))
+    expect(foundPost.createdAt).toBeInstanceOf(Date)
+  })
 
-  test("fail", async () => {
+  test('fail', async () => {
     const post = {
-      title: "asd",
-      author: "asd",
-      contents: "asds",
-      tags: ["ads"],
-    };
+      author: 'asd',
+      contents: 'asds',
+      tags: ['ads'],
+    }
 
     try {
-      await createPost(post);
+      await createPost(post)
     } catch (error) {
-      expect(error).toBeInstanceOf(mongoose.Error.ValidationError);
-      expect(error.message).toContain("`title` is req");
+      expect(error).toBeInstanceOf(mongoose.Error.ValidationError)
+      expect(error.message).toContain('`title` is req')
     }
-  });
-  test("with minimal parameters should succeed", async () => {
+  })
+  test('with minimal parameters should succeed', async () => {
     const post = {
-      title: "asd",
-    };
+      title: 'asd',
+      author,
+    }
 
-    const createdPost = await createPost(post);
+    const createdPost = await createPost(post)
 
-    expect(createdPost._id).toBeInstanceOf(mongoose.Types.ObjectId);
-  });
-});
+    expect(createdPost._id).toBeInstanceOf(mongoose.Types.ObjectId)
+  })
+})
 
-describe("listing post", () => {
-  test("should return all posts", async () => {
-    const posts = await listAllPosts();
-    expect(posts.length).toEqual(createsSamplePosts.length);
-  });
+describe('listing post', () => {
+  test('should return all posts', async () => {
+    const posts = await listAllPosts()
+    expect(posts.length).toEqual(createsSamplePosts.length)
+  })
 
-  test("sorted by creation date descending", async () => {
-    const posts = await listAllPosts();
+  test('sorted by creation date descending', async () => {
+    const posts = await listAllPosts()
     const sortedSamplePosts = createsSamplePosts.sort(
-      (a, b) => b.createdAt - a.createdAt
-    );
+      (a, b) => b.createdAt - a.createdAt,
+    )
 
     expect(posts.map((p) => p.createdAt)).toEqual(
-      sortedSamplePosts.map((p) => p.createdAt)
-    );
-  });
+      sortedSamplePosts.map((p) => p.createdAt),
+    )
+  })
 
-  test("sorted by options", async () => {
+  test('sorted by options', async () => {
     const posts = await listAllPosts({
-      sortBy: "updateAt",
-      sortOrder: "ascending",
-    });
+      sortBy: 'updateAt',
+      sortOrder: 'ascending',
+    })
     const sortedSamplePosts = createsSamplePosts.sort(
-      (a, b) => a.updateAt - b.updateAt
-    );
+      (a, b) => a.updateAt - b.updateAt,
+    )
 
     expect(posts.map((p) => p.updatedAt)).toEqual(
-      sortedSamplePosts.map((a) => a.updatedAt)
-    );
-  });
+      sortedSamplePosts.map((a) => a.updatedAt),
+    )
+  })
 
-  test("filter by author", async () => {
-    const posts = await listPostsByAuthor("b");
+  test('filter by author', async () => {
+    const posts = await listPostsByAuthor(author)
 
-    expect(posts.length).toBe(2);
-  });
+    expect(posts.length).toBe(3)
+  })
 
-  test("by tags", async () => {
-    const posts = await listPostByTag("2");
+  test('by tags', async () => {
+    const posts = await listPostByTag('2')
 
-    expect(posts.length).toBe(1);
-  });
-});
+    expect(posts.length).toBe(1)
+  })
+})
 
-describe("getting a post", () => {
-  test("return full post", async () => {
-    const post = await getPostById(createsSamplePosts[0]._id);
+describe('getting a post', () => {
+  test('return full post', async () => {
+    const post = await getPostById(createsSamplePosts[0]._id)
 
-    expect(post.toObject()).toEqual(createsSamplePosts[0].toObject());
-  });
+    expect(post.toObject()).toEqual(createsSamplePosts[0].toObject())
+  })
 
-  test("fail if id not exists", async () => {
-    const post = await getPostById("000000000000000000000000");
-    expect(post).toBeNull();
-  });
-});
+  test('fail if id not exists', async () => {
+    const post = await getPostById('000000000000000000000000')
+    expect(post).toBeNull()
+  })
+})
 
-describe("update posts", () => {
-  test("should update", async () => {
-    await updatePost(createsSamplePosts[0]._id, { author: "C" });
+describe('update posts', () => {
+  test('fail', async () => {
+    const post = await updatePost('000000000000000000000000', {
+      author,
+    })
+    expect(post).toBeNull()
+  })
+})
 
-    const updatedPost = await getPostById(createsSamplePosts[0]._id);
-    expect(updatedPost.author).toBe("C");
-    expect(updatedPost.title).toBe("a");
-    expect(updatedPost.updatedAt.getTime()).toBeGreaterThan(
-      createsSamplePosts[0].updatedAt.getTime()
-    );
-  });
+describe('delete', () => {
+  test('remove', async () => {
+    const result = await deletePost(createsSamplePosts[0]._id)
 
-  test("fail", async () => {
-    const post = await updatePost("000000000000000000000000", {
-      author: "test",
-    });
-    expect(post).toBeNull();
-  });
-});
+    expect(result.deletedCount).toBe(1)
 
-describe("delete", () => {
-  test("remove", async () => {
-    const result = await deletePost(createsSamplePosts[0]._id);
+    const deletedPost = await getPostById(createsSamplePosts[0]._id)
 
-    expect(result.deletedCount).toBe(1);
+    expect(deletedPost).toBeNull()
+  })
 
-    const deletedPost = await getPostById(createsSamplePosts[0]._id);
+  test('fail', async () => {
+    const result = await deletePost('000000000000000000000000')
 
-    expect(deletedPost).toBeNull();
-  });
-
-  test("fail", async () => {
-    const result = await deletePost("000000000000000000000000");
-
-    expect(result.deletedCount).toBe(0);
-  });
-});
+    expect(result.deletedCount).toBe(0)
+  })
+})

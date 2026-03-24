@@ -1,11 +1,13 @@
 import { useState } from 'react'
-import './App.css'
-import { PostList } from './components/PostList'
-import { CreatePost } from './components/CreatePost'
-import { PostFilter } from './components/PostFilter'
-import { PostSorting } from './components/PostSorting'
+import '../App.css'
+import { PostList } from '../components/PostList'
+import { CreatePost } from '../components/CreatePost'
+import { PostFilter } from '../components/PostFilter'
+import { PostSorting } from '../components/PostSorting'
 import { useQuery } from '@tanstack/react-query'
-import { getPosts, PostQuery } from './api/post'
+import { getPosts, PostQuery } from '../api/post'
+import { Header } from '../components/Header'
+import { Helmet } from 'react-helmet-async'
 
 export default function Blog() {
   const [author, setAuthor] = useState('')
@@ -13,7 +15,6 @@ export default function Blog() {
   const [sortOrder, setSortOrder] =
     useState<PostQuery['sortOrder']>('ascending')
   const postsQuery = useQuery({
-    initialData: [],
     queryKey: ['posts', { author, sortBy, sortOrder }],
     queryFn: () => getPosts({ author, sortBy, sortOrder }),
   })
@@ -21,7 +22,13 @@ export default function Blog() {
 
   return (
     <>
+      <Helmet>
+        <title>Blog</title>
+        <meta name='description' content='some des' />
+        <html lang='en' />
+      </Helmet>
       <div>
+        <Header />
         <CreatePost />
         <br />
         <hr />

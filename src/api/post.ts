@@ -26,13 +26,26 @@ export const getPosts = async (query: PostQuery = {}): Promise<Post[]> => {
   return res.json()
 }
 
-export const createPost = async (post: PostDto): Promise<Post> => {
+export const createPost = async (
+  post: PostDto,
+  token: string | undefined,
+): Promise<Post> => {
   const url = new URL(`${import.meta.env.VITE_BACKEND_URL}/api/v1/posts`)
 
   const res = await fetch(url, {
     method: 'POST',
     body: JSON.stringify(post),
-    headers: { 'content-type': 'application/json' },
+    headers: {
+      'content-type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
   })
+  return res.json()
+}
+
+export const getPost = async (id: string): Promise<Post> => {
+  const url = new URL(`${import.meta.env.VITE_BACKEND_URL}/api/v1/posts/${id}`)
+
+  const res = await fetch(url)
   return res.json()
 }
